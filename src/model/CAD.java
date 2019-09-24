@@ -32,13 +32,10 @@ public class CAD
             
             // On créé le statement :
             this.statement = this.connection.createStatement();
-            
-            System.out.print("Connecte!");
         }
         catch (final ClassNotFoundException | SQLException e)
         {
             this.connection = null;
-            System.out.print("Erreur!");
         }
     }
     
