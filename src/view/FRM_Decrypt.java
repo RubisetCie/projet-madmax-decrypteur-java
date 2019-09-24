@@ -1,16 +1,22 @@
 package view;
 
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import javax.swing.BoxLayout;
+import javax.swing.border.EmptyBorder;
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
 import java.io.File;
 
 import controller.WKF_Decrypt;
@@ -31,7 +37,7 @@ public class FRM_Decrypt
     private String fileOutput = "";
     
     // Les constantes de la fenêtre :
-    private static final String DIALOG_TITLE = "Outil de cryptage";
+    private final String DIALOG_TITLE = "Outil de cryptage";
     
     /**
      * Créé la vue.
@@ -60,11 +66,21 @@ public class FRM_Decrypt
     // Initialise la fenêtre :
     private void InitWindow()
     {
-        // Récupération du container :
-        final Container panel = frame.getContentPane();
+        // Création des panneaux :
+        final JPanel panel = new JPanel();
+        
+        final JPanel pheader = new JPanel();
+        final JPanel pinput = new JPanel();
+        final JPanel pinputb = new JPanel();
+        final JPanel pinputl = new JPanel();
+        final JPanel poutput = new JPanel();
+        final JPanel poutputb = new JPanel();
+        final JPanel poutputl = new JPanel();
+        final JPanel pkey = new JPanel();
+        final JPanel pconfirm = new JPanel();
         
         // Labels :
-        final JLabel lheader = new JLabel("Veuillez choisir les fichiers source et destination puis entrer la clef de décryptage.");
+        final JLabel lheader = new JLabel("Veuillez choisir les fichiers source et destination puis entrer la clef de décryptage.", SwingConstants.CENTER);
         final JLabel linput = new JLabel("Aucun fichier sélectionné.");
         final JLabel loutput = new JLabel("Aucun fichier sélectionné.");
         final JLabel lkey = new JLabel("Clef :");
@@ -78,14 +94,34 @@ public class FRM_Decrypt
         final JTextField key = new JTextField();
         
         // Positionnement & paramétrage des widgets :
-        panel.setLayout(null);
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         
-        lheader.setBounds(80, 24, 640, 16);
-        linput.setBounds(194, 86, 480, 16);
-        loutput.setBounds(194, 136, 480, 16);
-        lkey.setBounds(96, 186, 480, 16);
+        pheader.setBorder(new EmptyBorder(new Insets(8, 8, 8, 8)));
         
-        input.setBounds(32, 80, 150, 28);
+        pinput.setLayout(new GridLayout(1, 2));
+        pinput.setBorder(new EmptyBorder(new Insets(32, 32, 16, 16)));
+        
+        pinputb.setLayout(new BorderLayout());
+        pinputb.setBorder(new EmptyBorder(new Insets(2, 8, 2, 8)));
+        
+        pinputl.setLayout(new BorderLayout());
+        pinputl.setBorder(new EmptyBorder(new Insets(8, 8, 8, 8)));
+        
+        poutput.setLayout(new GridLayout(1, 2));
+        poutput.setBorder(new EmptyBorder(new Insets(16, 32, 16, 16)));
+        
+        poutputb.setLayout(new BorderLayout());
+        poutputb.setBorder(new EmptyBorder(new Insets(2, 8, 2, 8)));
+        
+        poutputl.setLayout(new BorderLayout());
+        poutputl.setBorder(new EmptyBorder(new Insets(8, 8, 8, 8)));
+        
+        pkey.setLayout(new GridLayout(1, 2));
+        pkey.setBorder(new EmptyBorder(new Insets(16, 64, 16, 32)));
+        
+        pconfirm.setLayout(new BorderLayout());
+        pconfirm.setBorder(new EmptyBorder(new Insets(8, 64, 16, 64)));
+        
         input.addActionListener(new ActionListener()
         {
             @Override
@@ -101,7 +137,6 @@ public class FRM_Decrypt
             }
         });
         
-        output.setBounds(32, 130, 150, 28);
         output.addActionListener(new ActionListener()
         {
             @Override
@@ -117,7 +152,6 @@ public class FRM_Decrypt
             }
         });
         
-        act.setBounds(120, 240, 400, 40);
         act.addActionListener(new ActionListener()
         {
             @Override
@@ -139,24 +173,40 @@ public class FRM_Decrypt
             }
         });
         
-        key.setBounds(150, 186, 380, 16);
-        
         // Ajout des widgets :
-        panel.add(lheader);
-        panel.add(linput);
-        panel.add(loutput);
-        panel.add(lkey);
+        pheader.add(lheader);
         
-        panel.add(input);
-        panel.add(output);
-        panel.add(act);
+        pinput.add(pinputb);
+        pinput.add(pinputl);
         
-        panel.add(key);
+        pinputb.add(input);
+        
+        pinputl.add(linput);
+        
+        poutput.add(poutputb);
+        poutput.add(poutputl);
+        
+        poutputb.add(output);
+        
+        poutputl.add(loutput);
+        
+        pkey.add(lkey);
+        pkey.add(key);
+        
+        pconfirm.add(act);
+        
+        panel.add(pheader);
+        panel.add(pinput);
+        panel.add(poutput);
+        panel.add(pkey);
+        panel.add(pconfirm);
+        
+        frame.add(panel);
         
         // Paramétrage de la fenêtre :
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         
-        frame.setSize(640, 340);
+        frame.setSize(640, 360);
         frame.setLocationRelativeTo(null);
         
         frame.addWindowListener(new WindowAdapter()

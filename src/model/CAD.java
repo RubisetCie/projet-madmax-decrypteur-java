@@ -9,7 +9,7 @@ public class CAD
 {
     // Les constantes de la base de données :
     private final String DB_DRIVER = "com.mysql.jdbc.Driver";
-    private final String DB_HOST = "jdbc:mysql://localhost/EMP";
+    private final String DB_HOST = "jdbc:mysql://localhost/seminaire_scientifique";
     private final String DB_USER = "";
     private final String DB_PASSWORD = "";
     

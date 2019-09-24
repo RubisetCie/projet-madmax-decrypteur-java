@@ -96,7 +96,7 @@ public class WKF_Decrypt
             }
             
             // Enfin, on compare le nombre de mots corrects par rapport au nombre de mots :
-            if ((float)correct / (float)words.length >= 0.5f)
+            if ((float)correct / (float)words.length >= CORRECT_RATIO)
             {
                 return 1;
             }

@@ -4,15 +4,20 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JButton;
 import javax.swing.JTextField;
-import java.awt.Container;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import javax.swing.BoxLayout;
+import javax.swing.border.EmptyBorder;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
 
 import controller.WKF_Cpte;
-import javax.swing.BoxLayout;
 
 /**
  * @author Matthieu Carteron
@@ -26,7 +31,7 @@ public class FRM_Auth
     public final JFrame frame;
     
     // Les constantes de la fenêtre :
-    private static final String DIALOG_TITLE = "Authentification";
+    private final String DIALOG_TITLE = "Authentification";
     
     /**
      * Créé la vue.
@@ -43,11 +48,16 @@ public class FRM_Auth
     // Initialise la fenêtre :
     private void InitWindow()
     {
-        // Récupération du container :
-        final Container panel = frame.getContentPane();
-        
+        // Création des panneaux :
+        final JPanel panel = new JPanel();
+
+        final JPanel pheader = new JPanel();
+        final JPanel plogin = new JPanel();
+        final JPanel ppassword = new JPanel();
+        final JPanel pconfirm = new JPanel();
+                
         // Labels :
-        final JLabel lheader = new JLabel("Veuillez entrer les informations d'authentification.");
+        final JLabel lheader = new JLabel("Veuillez entrer les informations d'authentification.", SwingConstants.CENTER);
         final JLabel llogin = new JLabel("Login :");
         final JLabel lpassword = new JLabel("Mot de passe :");
         
@@ -59,13 +69,19 @@ public class FRM_Auth
         final JTextField password = new JTextField();
         
         // Positionnement & paramétrage des widgets :
-        panel.setLayout(null);
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+        pheader.setBorder(new EmptyBorder(new Insets(8, 8, 8, 8)));
         
-        lheader.setBounds(160, 24, 320, 16);
-        llogin.setBounds(32, 100, 480, 16);
-        lpassword.setBounds(32, 140, 480, 16);
+        plogin.setLayout(new GridLayout(1, 2));
+        plogin.setBorder(new EmptyBorder(new Insets(48, 64, 16, 32)));
         
-        confirm.setBounds(120, 200, 400, 40);
+        ppassword.setLayout(new GridLayout(1, 2));
+        ppassword.setBorder(new EmptyBorder(new Insets(16, 64, 16, 32)));
+        
+        pconfirm.setLayout(new BorderLayout());
+        pconfirm.setBorder(new EmptyBorder(new Insets(16, 32, 16, 32)));
+        
         confirm.addActionListener(new ActionListener()
         {
             @Override
@@ -82,18 +98,23 @@ public class FRM_Auth
             }
         });
         
-        login.setBounds(150, 100, 380, 16);
-        password.setBounds(150, 140, 380, 16);
-        
         // Ajout des widgets :
-        panel.add(lheader);
-        panel.add(llogin);
-        panel.add(lpassword);
+        pheader.add(lheader);
         
-        panel.add(confirm);
+        plogin.add(llogin);
+        plogin.add(login);
+                
+        ppassword.add(lpassword);
+        ppassword.add(password);
         
-        panel.add(login);
-        panel.add(password);
+        pconfirm.add(confirm);
+        
+        panel.add(pheader);
+        panel.add(plogin);
+        panel.add(ppassword);
+        panel.add(pconfirm);
+        
+        frame.add(panel);
         
         // Paramétrage de la fenêtre :
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
