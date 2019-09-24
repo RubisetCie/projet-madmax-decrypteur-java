@@ -1,5 +1,7 @@
 package controller;
 
+import java.io.IOException;
+
 import view.FRM_Decrypt;
 import model.Files;
 import model.Decrypt;
@@ -28,8 +30,9 @@ public class WKF_Decrypt
     
     /**
      * Instantie la vue et le modèle.
+     * @param cad Référence sur le composant d'accès aux données.
      */
-    public WKF_Decrypt()
+    public WKF_Decrypt(final CAD cad)
     {
         // On instantie la vue d'authentification :
         this.view = new FRM_Decrypt(this);
@@ -38,7 +41,7 @@ public class WKF_Decrypt
         this.files = new Files();
         this.decrypt = new Decrypt();
         this.map = new Map_Dic();
-        this.cad = new CAD();
+        this.cad = cad;
     }
     
     /**
@@ -58,24 +61,32 @@ public class WKF_Decrypt
      */
     public boolean pcs_decrypter(final String source_path, final String destination_path, final String key)
     {
-        // On commence par récupérer le contenu du fichier :
-        final String data = this.files.getData(source_path);
-        
-        // Ensuite, on décrypte les données :
-        final String decrypted = this.decrypt.decrypt(data, key);
-        
-        // On compare avec le dictionnaire chacun des mots pour contrôler la validité de la clef :
-        final String[] words = decrypted.split(" ");
-        String sql;
-        
-        for (final String word : words)
+        try
         {
-            // On récupère la requête SQL à soumettre :
-            sql = map.selectWord(word);
-            
-            
-        }
+            // On commence par récupérer le contenu du fichier :
+            final String data = this.files.getData(source_path);
         
-        return true;
+            // Ensuite, on décrypte les données :
+            final String decrypted = this.decrypt.decrypt(data, key);
+
+            // On compare avec le dictionnaire chacun des mots pour contrôler la validité de la clef :
+            final String[] words = decrypted.split(" ");
+            String sql;
+
+            for (final String word : words)
+            {
+                // On récupère la requête SQL à soumettre :
+                sql = map.selectWord(word);
+
+                // On interroge la base de données sur le mot :
+                cad.GetRows(sql, "");
+            }
+
+            return true;
+        }
+        catch (final IOException e)
+        {
+            return false;
+        }
     }
 }

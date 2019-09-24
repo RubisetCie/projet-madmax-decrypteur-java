@@ -20,15 +20,16 @@ public class WKF_Cpte
     
     /**
      * Instantie la vue et le modèle.
+     * @param cad Référence sur le composant d'accès aux données.
      */
-    public WKF_Cpte()
+    public WKF_Cpte(final CAD cad)
     {
         // On instantie la vue d'authentification :
         this.view = new FRM_Auth(this);
         
         // On instantie les composants d'accès à la base de donnée :
         this.map = new Map_P();
-        this.cad = new CAD();
+        this.cad = cad;
     }
     
     /**
@@ -49,7 +50,7 @@ public class WKF_Cpte
         this.view.frame.dispose();
         
         // On instantie le contrôleur d'authentification :
-        new WKF_Decrypt();
+        new WKF_Decrypt(cad);
     }
     
     /**

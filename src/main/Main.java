@@ -1,7 +1,8 @@
 package main;
 
-import controller.WKF_Cpte;
 //import controller.WKF_Decrypt;
+import controller.WKF_Cpte;
+import model.CAD;
 
 /**
  * @author Matthieu Carteron
@@ -15,7 +16,7 @@ public class Main
     public static void main(String[] args)
     {
         // On instantie le contrôleur d'authentification :
-        new WKF_Cpte();
+        new WKF_Cpte(new CAD());
         //new WKF_Decrypt();
     }
 }
