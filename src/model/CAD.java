@@ -9,9 +9,9 @@ public class CAD
 {
     // Les constantes de la base de données :
     private final String DB_DRIVER = "com.mysql.jdbc.Driver";
-    private final String DB_HOST = "jdbc:mysql://localhost/seminaire_scientifique";
-    private final String DB_USER = "";
-    private final String DB_PASSWORD = "";
+    private final String DB_HOST = "jdbc:mysql://localhost:3306/seminaire_scientifique";
+    private final String DB_USER = "java";
+    private final String DB_PASSWORD = "Npadw41RyWy2DZFL";
     
     // La prise de connexion à la base de donnée :
     private Connection connection;
@@ -24,7 +24,7 @@ public class CAD
     {
         try
         {
-            // On enregistre le driver :
+            // On définit la classe du driver :
             Class.forName(DB_DRIVER);
             
             // On connecte à la base :
@@ -32,10 +32,13 @@ public class CAD
             
             // On créé le statement :
             this.statement = this.connection.createStatement();
+            
+            System.out.print("Connecte!");
         }
         catch (final ClassNotFoundException | SQLException e)
         {
             this.connection = null;
+            System.out.print("Erreur!");
         }
     }
     
