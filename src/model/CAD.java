@@ -36,7 +36,6 @@ public class CAD
         catch (final ClassNotFoundException | SQLException e)
         {
             this.connection = null;
-            this.statement = null;
         }
     }
     
@@ -48,6 +47,9 @@ public class CAD
      */
     public ResultSet GetRows(final String rq_sql/*, final String resultSetName*/) throws SQLException
     {
+        if (this.connection == null)
+            throw new SQLException();
+        
         return this.statement.executeQuery(rq_sql);
     }
     
@@ -58,6 +60,9 @@ public class CAD
      */
     public void ActionRows(final String rq_sql) throws SQLException
     {
+        if (this.connection == null)
+            throw new SQLException();
+        
         this.statement.executeUpdate(rq_sql);
     }
 }
