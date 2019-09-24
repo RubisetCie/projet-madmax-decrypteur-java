@@ -13,6 +13,7 @@ public class Map_P
      */
     public String selectIDbyLoginPassword(final String login, final String password)
     {
+        // Penser au hashage du mot de passe !
         return "";
     }
 }

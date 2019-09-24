@@ -1,5 +1,7 @@
 package controller;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.io.IOException;
 
 import view.FRM_Decrypt;
@@ -28,6 +30,9 @@ public class WKF_Decrypt
     // Le composant d'accès aux données :
     private final CAD cad;
     
+    // Le ratio pour la validité du décryptage :
+    private final float CORRECT_RATIO = 0.5f;
+    
     /**
      * Instantie la vue et le modèle.
      * @param cad Référence sur le composant d'accès aux données.
@@ -53,13 +58,13 @@ public class WKF_Decrypt
     }
     
     /**
-     * Décrypte un fichier.
-     * @param source_path L'adresse du fichier source à décrypter.
+     * Crypte/décrypte un fichier.
+     * @param source_path L'adresse du fichier source à crypter.
      * @param destination_path L'adresse du fichier destination.
-     * @param key La clef de décryptage.
-     * @return Le succès du décryptage.
+     * @param key La clef de cryptage.
+     * @return Le succès du cryptage/décryptage.
      */
-    public boolean pcs_decrypter(final String source_path, final String destination_path, final String key)
+    public int pcs_decrypter(final String source_path, final String destination_path, final String key)
     {
         try
         {
@@ -71,7 +76,9 @@ public class WKF_Decrypt
 
             // On compare avec le dictionnaire chacun des mots pour contrôler la validité de la clef :
             final String[] words = decrypted.split(" ");
+            ResultSet rs;
             String sql;
+            int correct = 0;
 
             for (final String word : words)
             {
@@ -79,14 +86,26 @@ public class WKF_Decrypt
                 sql = map.selectWord(word);
 
                 // On interroge la base de données sur le mot :
-                cad.GetRows(sql, "");
+                rs = cad.GetRows(sql);
+                
+                // Si le mot est valide, on incrémente le compteur :
+                if (rs.next())
+                    correct++;
+                
+                rs.close();
+            }
+            
+            // Enfin, on compare le nombre de mots corrects par rapport au nombre de mots :
+            if ((float)correct / (float)words.length >= 0.5f)
+            {
+                return 1;
             }
 
-            return true;
+            return 2;
         }
-        catch (final IOException e)
+        catch (final IOException | SQLException e)
         {
-            return false;
+            return 0;
         }
     }
 }

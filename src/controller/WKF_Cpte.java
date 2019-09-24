@@ -1,5 +1,8 @@
 package controller;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 import view.FRM_Auth;
 import model.Map_P;
 import model.CAD;
@@ -65,8 +68,22 @@ public class WKF_Cpte
         final String sql = map.selectIDbyLoginPassword(login, password);
         
         // On interroge la base de données sur le login/password :
-        cad.GetRows(sql, "");
-        
-        return true;
+        try
+        {
+            final ResultSet rs = cad.GetRows(sql);
+            
+            if (rs.next())
+            {
+                rs.close();
+                return true;
+            }
+            
+            rs.close();
+        }
+        catch (final SQLException e)
+        {
+        }
+
+        return false;
     }
 }

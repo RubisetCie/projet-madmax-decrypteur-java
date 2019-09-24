@@ -7,11 +7,11 @@ import java.sql.*;
  */
 public class CAD
 {
-    // Les constantes de la fenêtre :
-    private static final String DB_DRIVER = "com.mysql.jdbc.Driver";
-    private static final String DB_HOST = "jdbc:mysql://localhost/EMP";
-    private static final String DB_USER = "";
-    private static final String DB_PASSWORD = "";
+    // Les constantes de la base de données :
+    private final String DB_DRIVER = "com.mysql.jdbc.Driver";
+    private final String DB_HOST = "jdbc:mysql://localhost/EMP";
+    private final String DB_USER = "";
+    private final String DB_PASSWORD = "";
     
     // La prise de connexion à la base de donnée :
     private Connection connection;
