@@ -33,6 +33,9 @@ public class FRM_Decrypt
     // La frame principale :
     public final JFrame frame;
     
+    // Le label pour afficher les informations du processus :
+    public JLabel lheader;
+    
     // Les chemins d'accès des fichiers :
     private String fileInput = "";
     private String fileOutput = "";
@@ -81,7 +84,7 @@ public class FRM_Decrypt
         final JPanel pconfirm = new JPanel();
         
         // Labels :
-        final JLabel lheader = new JLabel("Veuillez choisir les fichiers source et destination puis entrer la clef de décryptage.", SwingConstants.CENTER);
+        this.lheader = new JLabel("Veuillez choisir les fichiers source et destination puis entrer la clef de décryptage.", SwingConstants.CENTER);
         final JLabel linput = new JLabel("Aucun fichier sélectionné.");
         final JLabel loutput = new JLabel("Aucun fichier sélectionné.");
         final JLabel lkey = new JLabel("Clef : 0 / 12 caractères (à Bruteforce : 12) :");

@@ -89,7 +89,7 @@ public class FRM_Auth
             public void actionPerformed(ActionEvent e)
             {
                 // On teste les identifiants entrés :
-                if (controller.pcs_authentifier(login.getText(), password.getText()))
+                if (controller.pcs_authentifier(login.getText(), new String(password.getPassword())))
                     controller.OnLogin();
                 else
                 {

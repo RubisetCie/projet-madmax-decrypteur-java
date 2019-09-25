@@ -1,5 +1,7 @@
 package controller;
 
+//import javax.swing.SwingUtilities;
+//import java.awt.Color;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.io.IOException;
@@ -78,24 +80,28 @@ public class WKF_Decrypt
             // On commence par récupérer le contenu du fichier :
             final String data = this.files.getData(source_path);
             //final String data = "";
-            
+
             // Si la clef est complète (12 caractères), on ne tente qu'un seul décryptage :
             if (key.length() == 12)
             {
-                System.out.println(data);
-                
+                // On décrypte les données :
                 final String decrypted = this.decrypt.decrypt(data, key);
-
-                System.out.println(decrypted);
 
                 // Enfin, on écrit le contenu dans le fichier destination :
                 this.files.setData(destination_path, decrypted);
-                
+
                 // On compare avec le dictionnaire chacun des mots pour contrôler la validité de la clef :
-                if (this.checkDictionary(decrypted))
-                    return 2;
-                else
+                try
+                {
+                    if (this.checkDictionary(decrypted))
+                        return 2;
+                    else
+                        return 1;
+                }
+                catch (final SQLException e)
+                {
                     return 1;
+                }
             }
             // Sinon, on 'bruteforce' le reste des caractères jusqu'a ce que la chaîne décryptée soit valide :
             else
@@ -104,42 +110,60 @@ public class WKF_Decrypt
                 final long toBruteforce = (long)Math.pow(KEY_ALPHABET_LENGTH, charLeft);
                 final int[] tempKey = new int[charLeft];
                 final char[] tempKeyChar = new char[charLeft];
-                
+
                 String decrypted;
                 String testKey;
-                
+
                 // On commence par générer une chaîne de caractères qui fera office de première clef :
                 for (int i = 0; i < charLeft; i++)
                     tempKey[i] = KEY_ALPHABET[0];
                 
+                /*this.view.lheader.setForeground(Color.black);
+                this.view.lheader.setText("Clefs utilisés : 0 / " + toBruteforce + " (0 % testés)...");
+                
+                SwingUtilities.updateComponentTreeUI(this.view.frame);*/
+
                 for (long i = 0; i < toBruteforce; i++)
                 {
                     // On décale la clef précédente d'une lettre :
                     this.shiftKey(tempKey, charLeft);
-                    
+
                     // On transforme la clef en lettres selon l'alphabet :
                     for (int j = 0; j < charLeft; j++)
                         tempKeyChar[j] = KEY_ALPHABET[tempKey[j]];
-                    
+
                     // On combine les deux :
                     testKey = key + new String(tempKeyChar);
-                    
+
                     decrypted = this.decrypt.decrypt(data, testKey);
-                    
+
                     // On compare avec le dictionnaire chacun des mots pour contrôler la validité de la clef :
-                    if (this.checkDictionary(decrypted))
+                    try
                     {
-                        // Enfin, on écrit le contenu dans le fichier destination :
-                        this.files.setData(destination_path, decrypted);
-                        
-                        return 2;
+                        if (this.checkDictionary(decrypted))
+                        {
+                            // Enfin, on écrit le contenu dans le fichier destination :
+                            this.files.setData(destination_path, decrypted);
+
+                            return 2;
+                        }
                     }
+                    catch (final SQLException e)
+                    {
+                    }
+                    
+/*                    this.view.lheader.setText("Clefs utilisés : " + i + " / " + toBruteforce + " (" + (i / toBruteforce) * 100 + " % testés)...");
+                    
+                    SwingUtilities.updateComponentTreeUI(this.view.frame);
+                    
+                    this.view.frame.invalidate();
+                    this.view.frame.validate();
+                    this.view.frame.repaint();*/
                 }
             }
         }
-        catch (final IOException | SQLException e)
+        catch (final IOException e)
         {
-            e.printStackTrace();
         }
         
         return 0;
