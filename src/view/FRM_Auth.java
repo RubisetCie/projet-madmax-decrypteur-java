@@ -4,6 +4,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JButton;
 import javax.swing.JTextField;
+import javax.swing.JPasswordField;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.BoxLayout;
@@ -66,7 +67,7 @@ public class FRM_Auth
         
         // Champs de texte :
         final JTextField login = new JTextField();
-        final JTextField password = new JTextField();
+        final JPasswordField password = new JPasswordField();
         
         // Positionnement & paramétrage des widgets :
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));

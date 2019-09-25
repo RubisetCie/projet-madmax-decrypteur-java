@@ -13,7 +13,6 @@ public class Map_P
      */
     public String selectIDbyLoginPassword(final String login, final String password)
     {
-        // Penser au hashage du mot de passe !
-        return "";
+        return "SELECT * FROM `user` WHERE `username` = '" + login + "' AND `password` = '" + password + "';";
     }
 }
