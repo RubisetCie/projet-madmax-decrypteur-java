@@ -33,6 +33,13 @@ public class WKF_Decrypt
     // Le ratio pour la validité du décryptage :
     private final float CORRECT_RATIO = 0.5f;
     
+    // Le nombre de caractères différents pour une lettre de la clef :
+    private final int KEY_ALPHABET_LENGTH = 26;
+    
+    // L'alphabet possible pour la clef :
+    // Note : on pose pour hypothèse que la clef n'est composée que de lettres de l'alphabet miniscule (26 possibilités) :
+    private final char[] KEY_ALPHABET = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
+    
     /**
      * Instantie la vue et le modèle.
      * @param cad Référence sur le composant d'accès aux données.
@@ -70,42 +77,106 @@ public class WKF_Decrypt
         {
             // On commence par récupérer le contenu du fichier :
             final String data = this.files.getData(source_path);
-        
-            // Ensuite, on décrypte les données :
-            final String decrypted = this.decrypt.decrypt(data, key);
-
-            // On compare avec le dictionnaire chacun des mots pour contrôler la validité de la clef :
-            final String[] words = decrypted.split(" ");
-            ResultSet rs;
-            String sql;
-            int correct = 0;
-
-            for (final String word : words)
-            {
-                // On récupère la requête SQL à soumettre :
-                sql = map.selectWord(word);
-
-                // On interroge la base de données sur le mot :
-                rs = cad.GetRows(sql);
-                
-                // Si le mot est valide, on incrémente le compteur :
-                if (rs.next())
-                    correct++;
-                
-                rs.close();
-            }
+            //final String data = "";
             
-            // Enfin, on compare le nombre de mots corrects par rapport au nombre de mots :
-            if ((float)correct / (float)words.length >= CORRECT_RATIO)
+            // Si la clef est complète (12 caractères), on ne tente qu'un seul décryptage :
+            if (key.length() == 12)
             {
-                return 1;
-            }
+                final String decrypted = this.decrypt.decrypt(data, key);
 
-            return 2;
+                // On compare avec le dictionnaire chacun des mots pour contrôler la validité de la clef :
+                if (this.checkDictionary(decrypted))
+                    return 2;
+                else
+                    return 1;
+            }
+            // Sinon, on 'bruteforce' le reste des caractères jusqu'a ce que la chaîne décryptée soit valide :
+            else
+            {
+                final int charLeft = 12 - key.length();
+                final long toBruteforce = (long)Math.pow(KEY_ALPHABET_LENGTH, charLeft);
+                final int[] tempKey = new int[charLeft];
+                final char[] tempKeyChar = new char[charLeft];
+                
+                String decrypted;
+                String testKey;
+                
+                // On commence par générer une chaîne de caractères qui fera office de première clef :
+                for (int i = 0; i < charLeft; i++)
+                    tempKey[i] = KEY_ALPHABET[0];
+                
+                for (long i = 0; i < toBruteforce; i++)
+                {
+                    // On décale la clef précédente d'une lettre :
+                    this.shiftKey(tempKey, charLeft);
+                    
+                    // On transforme la clef en lettres selon l'alphabet :
+                    for (int j = 0; j < charLeft; j++)
+                        tempKeyChar[j] = KEY_ALPHABET[tempKey[j]];
+                    
+                    // On combine les deux :
+                    testKey = key + new String(tempKeyChar);
+                    
+                    decrypted = this.decrypt.decrypt(data, testKey);
+                    
+                    // On compare avec le dictionnaire chacun des mots pour contrôler la validité de la clef :
+                    if (this.checkDictionary(decrypted))
+                        return 2;
+                }
+            }
         }
         catch (final IOException | SQLException e)
         {
-            return 0;
+        }
+        
+        return 0;
+    }
+    
+    // Compare une chaîne décryptée avec le dictionnaire en ligne :
+    private boolean checkDictionary(final String data) throws SQLException
+    {
+        final String[] words = data.split(" ");
+        
+        ResultSet rs;
+        String sql;
+        
+        int correct = 0;
+
+        for (final String word : words)
+        {
+            // On récupère la requête SQL à soumettre :
+            sql = map.selectWord(word);
+
+            // On interroge la base de données sur le mot :
+            rs = cad.GetRows(sql);
+
+            // Si le mot est valide, on incrémente le compteur :
+            if (rs.next())
+                correct++;
+
+            rs.close();
+        }
+
+        // Enfin, on compare le nombre de mots corrects par rapport au nombre de mots :
+        if ((float)correct / (float)words.length >= CORRECT_RATIO)
+        {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    // Décale la clef précédente d'une lettre vers la droite :
+    private void shiftKey(final int[] key, final int l)
+    {
+        for (int i = 0; i < l; i++)
+        {
+            key[i]++;
+            
+            if (key[i] >= KEY_ALPHABET_LENGTH)
+                key[i] = 0;
+            else
+                return;
         }
     }
 }

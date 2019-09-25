@@ -20,6 +20,7 @@ import java.awt.Insets;
 import java.io.File;
 
 import controller.WKF_Decrypt;
+import model.KeyTextField;
 
 /**
  * @author Matthieu Carteron
@@ -83,7 +84,7 @@ public class FRM_Decrypt
         final JLabel lheader = new JLabel("Veuillez choisir les fichiers source et destination puis entrer la clef de décryptage.", SwingConstants.CENTER);
         final JLabel linput = new JLabel("Aucun fichier sélectionné.");
         final JLabel loutput = new JLabel("Aucun fichier sélectionné.");
-        final JLabel lkey = new JLabel("Clef :");
+        final JLabel lkey = new JLabel("Clef : 0 / 12 caractères (à Bruteforce : 12) :");
         
         // Boutons :
         final JButton input = new JButton("Choisir source");
@@ -92,6 +93,7 @@ public class FRM_Decrypt
         
         // Champ de texte :
         final JTextField key = new JTextField();
+        final KeyTextField keyfield = new KeyTextField(lkey, 12);   // Champ de texte custom !
         
         // Positionnement & paramétrage des widgets :
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -118,6 +120,7 @@ public class FRM_Decrypt
         
         pkey.setLayout(new GridLayout(1, 2));
         pkey.setBorder(new EmptyBorder(new Insets(16, 64, 16, 32)));
+        key.setDocument(keyfield);
         
         pconfirm.setLayout(new BorderLayout());
         pconfirm.setBorder(new EmptyBorder(new Insets(8, 64, 16, 64)));
@@ -147,7 +150,7 @@ public class FRM_Decrypt
                 if (!destination.isEmpty())
                 {
                     fileOutput = destination;
-                    loutput.setText(fileInput);
+                    loutput.setText(fileOutput);
                 }
             }
         });
@@ -160,10 +163,24 @@ public class FRM_Decrypt
                 // On vérifie que les paramètres sont valides pas vides :
                 String k = key.getText();
                 
-                if (new File(fileInput).exists() && new File(fileOutput).exists() && !k.isEmpty())
+                if (new File(fileInput).exists() && !fileOutput.isEmpty() && !k.isEmpty())
                 {
                     // On décrypte le fichier :
-                    controller.pcs_decrypter(fileInput, fileOutput, k);
+                    switch (controller.pcs_decrypter(fileInput, fileOutput, k))
+                    {
+                        case 0 :
+                            lheader.setText("L'opération a échouée.");
+                            lheader.setForeground(Color.red);
+                            break;
+                        case 1 :
+                            lheader.setText("L'opération s'est déroulée correctement mais le décryptage pourrait être invalide.");
+                            lheader.setForeground(Color.orange);
+                            break;
+                        case 2 :
+                            lheader.setText("Le décryptage s'est déroulé avec succès.");
+                            lheader.setForeground(Color.green);
+                            break;
+                    }
                 }
                 else
                 {
