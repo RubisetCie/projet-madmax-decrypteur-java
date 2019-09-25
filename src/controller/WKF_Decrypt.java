@@ -82,8 +82,15 @@ public class WKF_Decrypt
             // Si la clef est complète (12 caractères), on ne tente qu'un seul décryptage :
             if (key.length() == 12)
             {
+                System.out.println(data);
+                
                 final String decrypted = this.decrypt.decrypt(data, key);
 
+                System.out.println(decrypted);
+
+                // Enfin, on écrit le contenu dans le fichier destination :
+                this.files.setData(destination_path, decrypted);
+                
                 // On compare avec le dictionnaire chacun des mots pour contrôler la validité de la clef :
                 if (this.checkDictionary(decrypted))
                     return 2;
@@ -121,12 +128,18 @@ public class WKF_Decrypt
                     
                     // On compare avec le dictionnaire chacun des mots pour contrôler la validité de la clef :
                     if (this.checkDictionary(decrypted))
+                    {
+                        // Enfin, on écrit le contenu dans le fichier destination :
+                        this.files.setData(destination_path, decrypted);
+                        
                         return 2;
+                    }
                 }
             }
         }
         catch (final IOException | SQLException e)
         {
+            e.printStackTrace();
         }
         
         return 0;
@@ -135,7 +148,7 @@ public class WKF_Decrypt
     // Compare une chaîne décryptée avec le dictionnaire en ligne :
     private boolean checkDictionary(final String data) throws SQLException
     {
-        final String[] words = data.split(" ");
+        final String[] words = data.split(" |\\.|\n");
         
         ResultSet rs;
         String sql;

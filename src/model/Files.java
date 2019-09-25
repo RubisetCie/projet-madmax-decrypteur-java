@@ -1,7 +1,5 @@
 package model;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -19,16 +17,16 @@ public class Files
      */
     public String getData(final String path) throws IOException
     {
-        // On lit le texte ligne par ligne dans le fichier :
-        final BufferedReader reader = new BufferedReader(new FileReader(path));
-        
-        String line = reader.readLine();
+        // On lit le texte caractère par caractère dans le fichier :
+        final FileReader reader = new FileReader(path);
+
         String data = "";
+        int c = reader.read();
         
-        while (line != null)
+        while (c != -1)
         {
-            data += line;
-            line = reader.readLine();
+            data += (char)c;
+            c = reader.read();
         }
 
         reader.close();
@@ -45,9 +43,9 @@ public class Files
     public void setData(final String path, final String data) throws IOException
     {
         // On écrit le texte dans le fichier :
-        final BufferedWriter writer = new BufferedWriter(new FileWriter(path));
+        final FileWriter writer = new FileWriter(path);
+        
         writer.write(data);
-
         writer.close();
     }
 }

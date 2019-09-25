@@ -13,7 +13,7 @@ import javax.swing.text.BadLocationException;
 public class KeyTextField extends PlainDocument implements DocumentListener
 {
     // Référence sur le label de la clef :
-    private final JLabel keylabel;
+    private final JLabel keyLabel;
     
     // Le nombre de caractère limite :
     private final int limit;
@@ -29,7 +29,7 @@ public class KeyTextField extends PlainDocument implements DocumentListener
         
         this.addDocumentListener(this); // On ajoute l'objet lui-même en tant que listener.
         
-        this.keylabel = keylabel;
+        this.keyLabel = keylabel;
         this.limit = limit;
     }
     
@@ -66,6 +66,6 @@ public class KeyTextField extends PlainDocument implements DocumentListener
     // Change le label de la clef :
     private void changeString(int length)
     {
-        this.keylabel.setText("Clef : " + length + " / 12 caractères (à Bruteforce : " + (12-length) + ") :");
+        this.keyLabel.setText("Clef : " + length + " / 12 caractères (à Bruteforce : " + (12-length) + ") :");
     }
 }
