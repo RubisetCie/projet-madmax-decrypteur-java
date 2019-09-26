@@ -55,7 +55,7 @@ public class WKF_Cpte
      */
     public void OnClose()
     {
-        this.view.frame.dispose();
+        this.view.getFrame().dispose();
         System.exit(0);
     }
     
@@ -65,7 +65,7 @@ public class WKF_Cpte
     public void OnLogin()
     {
         // On dispose la fenêtre d'authentification :
-        this.view.frame.dispose();
+        this.view.getFrame().dispose();
         
         // On instantie le contrôleur d'authentification :
         new WKF_Decrypt(cad);

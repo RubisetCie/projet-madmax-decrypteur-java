@@ -29,7 +29,7 @@ public class FRM_Auth
     private final WKF_Cpte controller;
     
     // La frame principale :
-    public final JFrame frame;
+    private final JFrame frame;
     
     // Les constantes de la fenêtre :
     private final String DIALOG_TITLE = "Authentification";
@@ -133,5 +133,14 @@ public class FRM_Auth
         });
         
         frame.setVisible(true);
+    }
+    
+    /**
+     * Permet d'obtenir la référence sur la fenêtre.
+     * @return Référence sur la fenêtre.
+     */
+    public JFrame getFrame()
+    {
+        return this.frame;
     }
 }

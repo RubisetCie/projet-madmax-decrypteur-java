@@ -20,7 +20,7 @@ import java.awt.Insets;
 import java.io.File;
 
 import controller.WKF_Decrypt;
-import model.KeyTextField;
+import model.DecryptResult;
 
 /**
  * @author Matthieu Carteron
@@ -31,10 +31,10 @@ public class FRM_Decrypt
     private final WKF_Decrypt controller;
     
     // La frame principale :
-    public final JFrame frame;
+    private final JFrame frame;
     
     // Le label pour afficher les informations du processus :
-    public JLabel lheader;
+    private JLabel lheader;
     
     // Les chemins d'accès des fichiers :
     private String fileInput = "";
@@ -169,20 +169,33 @@ public class FRM_Decrypt
                 if (new File(fileInput).exists() && !fileOutput.isEmpty() && !k.isEmpty())
                 {
                     // On décrypte le fichier :
-                    switch (controller.pcs_decrypter(fileInput, fileOutput, k))
+                    DecryptResult result = controller.pcs_decrypter(fileInput, fileOutput, k);
+                    
+                    if (result.succeed)
                     {
-                        case 0 :
-                            lheader.setText("L'opération a échouée.");
-                            lheader.setForeground(Color.red);
-                            break;
-                        case 1 :
-                            lheader.setText("L'opération s'est déroulée correctement mais le décryptage pourrait être invalide.");
-                            lheader.setForeground(Color.orange);
-                            break;
-                        case 2 :
-                            lheader.setText("Le décryptage s'est déroulé avec succès.");
+                        if (result.key.isEmpty())
+                        {
+                            if (result.recognized)
+                            {
+                                lheader.setText("Le décryptage s'est déroulé avec succès.");
+                                lheader.setForeground(Color.green);
+                            }
+                            else
+                            {
+                                lheader.setText("L'opération s'est déroulée correctement mais le décryptage pourrait être invalide.");
+                                lheader.setForeground(Color.orange);
+                            }
+                        }
+                        else
+                        {
+                            lheader.setText("Le décryptage s'est déroulé avec succès avec la clef : " + result.key);
                             lheader.setForeground(Color.green);
-                            break;
+                        }
+                    }
+                    else
+                    {
+                        lheader.setText("L'opération a échouée.");
+                        lheader.setForeground(Color.red);
                     }
                 }
                 else
@@ -270,5 +283,23 @@ public class FRM_Decrypt
             return fc.getSelectedFile().getAbsolutePath();
         
         return "";
+    }
+    
+    /**
+     * Permet d'obtenir la référence sur la fenêtre.
+     * @return Référence sur la fenêtre.
+     */
+    public JFrame getFrame()
+    {
+        return this.frame;
+    }
+    
+    /**
+     * Permet d'obtenir la référence sur le label d'en-tête.
+     * @return Référence sur le label.
+     */
+    public JLabel getHeaderLabel()
+    {
+        return this.lheader;
     }
 }

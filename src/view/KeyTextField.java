@@ -1,4 +1,4 @@
-package model;
+package view;
 
 import javax.swing.JLabel;
 import javax.swing.event.DocumentEvent;
