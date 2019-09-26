@@ -11,6 +11,7 @@ import model.Files;
 import model.Decrypt;
 import model.Map_Dic;
 import model.CAD;
+import model.DecryptResult;
 
 /**
  * @author Matthieu Carteron
@@ -34,13 +35,6 @@ public class WKF_Decrypt
     
     // Le ratio pour la validité du décryptage :
     private final float CORRECT_RATIO = 0.5f;
-    
-    // Le nombre de caractères différents pour une lettre de la clef :
-    private final int KEY_ALPHABET_LENGTH = 26;
-    
-    // L'alphabet possible pour la clef :
-    // Note : on pose pour hypothèse que la clef n'est composée que de lettres de l'alphabet miniscule (26 possibilités) :
-    private final char[] KEY_ALPHABET = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
     
     /**
      * Instantie la vue et le modèle.
@@ -71,10 +65,12 @@ public class WKF_Decrypt
      * @param source_path L'adresse du fichier source à crypter.
      * @param destination_path L'adresse du fichier destination.
      * @param key La clef de cryptage.
-     * @return Le succès du cryptage/décryptage.
+     * @return Le résultat du cryptage/décryptage.
      */
-    public int pcs_decrypter(final String source_path, final String destination_path, final String key)
+    public DecryptResult pcs_decrypter(final String source_path, final String destination_path, final String key)
     {
+        final DecryptResult result = new DecryptResult();
+        
         try
         {
             // On commence par récupérer le contenu du fichier :
@@ -89,88 +85,46 @@ public class WKF_Decrypt
 
                 // Enfin, on écrit le contenu dans le fichier destination :
                 this.files.setData(destination_path, decrypted);
+                
+                // On set le succès dans le retour :
+                result.succeed = true;
+                result.recognized = false;
 
                 // On compare avec le dictionnaire chacun des mots pour contrôler la validité de la clef :
                 try
                 {
                     if (this.checkDictionary(decrypted))
-                        return 2;
-                    else
-                        return 1;
+                        result.recognized = true;
                 }
                 catch (final SQLException e)
                 {
-                    return 1;
                 }
+                
+                return result;
             }
             // Sinon, on 'bruteforce' le reste des caractères jusqu'a ce que la chaîne décryptée soit valide :
             else
             {
-                final int charLeft = 12 - key.length();
-                final long toBruteforce = (long)Math.pow(KEY_ALPHABET_LENGTH, charLeft);
-                final int[] tempKey = new int[charLeft];
-                final char[] tempKeyChar = new char[charLeft];
-
-                String decrypted;
-                String testKey;
-
-                // On commence par générer une chaîne de caractères qui fera office de première clef :
-                for (int i = 0; i < charLeft; i++)
-                    tempKey[i] = KEY_ALPHABET[0];
                 
-                /*this.view.lheader.setForeground(Color.black);
-                this.view.lheader.setText("Clefs utilisés : 0 / " + toBruteforce + " (0 % testés)...");
-                
-                SwingUtilities.updateComponentTreeUI(this.view.frame);*/
-
-                for (long i = 0; i < toBruteforce; i++)
-                {
-                    // On décale la clef précédente d'une lettre :
-                    this.shiftKey(tempKey, charLeft);
-
-                    // On transforme la clef en lettres selon l'alphabet :
-                    for (int j = 0; j < charLeft; j++)
-                        tempKeyChar[j] = KEY_ALPHABET[tempKey[j]];
-
-                    // On combine les deux :
-                    testKey = key + new String(tempKeyChar);
-
-                    decrypted = this.decrypt.decrypt(data, testKey);
-
-                    // On compare avec le dictionnaire chacun des mots pour contrôler la validité de la clef :
-                    try
-                    {
-                        if (this.checkDictionary(decrypted))
-                        {
-                            // Enfin, on écrit le contenu dans le fichier destination :
-                            this.files.setData(destination_path, decrypted);
-
-                            return 2;
-                        }
-                    }
-                    catch (final SQLException e)
-                    {
-                    }
                     
-/*                    this.view.lheader.setText("Clefs utilisés : " + i + " / " + toBruteforce + " (" + (i / toBruteforce) * 100 + " % testés)...");
+                    /*this.view.lheader.setText("Clefs utilisés : " + i + " / " + toBruteforce + " (" + (i / toBruteforce) * 100 + " % testés)...");
                     
                     SwingUtilities.updateComponentTreeUI(this.view.frame);
                     
                     this.view.frame.invalidate();
                     this.view.frame.validate();
                     this.view.frame.repaint();*/
-                }
             }
         }
         catch (final IOException e)
         {
         }
         
-        return 0;
+        return result;
     }
     
     // Compare une chaîne décryptée avec le dictionnaire en ligne :
-    private boolean checkDictionary(final String data) throws SQLException
+    public boolean checkDictionary(final String data) throws SQLException
     {
         final String[] words = data.split(" |\\.|\n");
         
@@ -203,17 +157,8 @@ public class WKF_Decrypt
         return false;
     }
     
-    // Décale la clef précédente d'une lettre vers la droite :
-    private void shiftKey(final int[] key, final int l)
+    public Files getFiles()
     {
-        for (int i = 0; i < l; i++)
-        {
-            key[i]++;
-            
-            if (key[i] >= KEY_ALPHABET_LENGTH)
-                key[i] = 0;
-            else
-                return;
-        }
+        return this.files
     }
 }
