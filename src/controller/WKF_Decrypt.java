@@ -11,6 +11,7 @@ import model.Files;
 import model.Decrypt;
 import model.Map_Dic;
 import model.CAD;
+import model.Bruteforce;
 import model.DecryptResult;
 
 /**
@@ -61,6 +62,33 @@ public class WKF_Decrypt
     }
     
     /**
+     * Appelé lorsque le bruteforce se termine.
+     * @param destination L'adresse du fichier destination.
+     * @param decrypted La chaîne de caractères décryptée.
+     * @param result Référence sur le résultat à retourner.
+     */
+    public void onFinished(final String destination, final String decrypted, final DecryptResult result)
+    {
+        // On déverrouille la vue :
+        this.view.setButtonsActive(true);
+                
+        // Enfin, on écrit le contenu dans le fichier destination :
+        try
+        {
+            // Enfin, on écrit le contenu dans le fichier destination :
+            this.files.setData(destination, decrypted);
+            
+            // On set le succès dans le retour :
+            result.succeed = true;
+            
+            this.view.setResult(result);
+        }
+        catch (final IOException e)
+        {
+        }
+    }
+    
+    /**
      * Crypte/décrypte un fichier.
      * @param source_path L'adresse du fichier source à crypter.
      * @param destination_path L'adresse du fichier destination.
@@ -105,15 +133,14 @@ public class WKF_Decrypt
             // Sinon, on 'bruteforce' le reste des caractères jusqu'a ce que la chaîne décryptée soit valide :
             else
             {
+                // On verrouille la vue :
+                this.view.setButtonsActive(false);
                 
-                    
-                    /*this.view.lheader.setText("Clefs utilisés : " + i + " / " + toBruteforce + " (" + (i / toBruteforce) * 100 + " % testés)...");
-                    
-                    SwingUtilities.updateComponentTreeUI(this.view.frame);
-                    
-                    this.view.frame.invalidate();
-                    this.view.frame.validate();
-                    this.view.frame.repaint();*/
+                // On créé le thread :
+                Thread thread = new Thread(new Bruteforce(this, data, destination_path, key, 12 - key.length(), result));
+                
+                // On démarre le thread :
+                thread.start();
             }
         }
         catch (final IOException e)
@@ -157,8 +184,21 @@ public class WKF_Decrypt
         return false;
     }
     
-    public Files getFiles()
+    /**
+     * Permet d'obtenir la vue.
+     * @return La référence sur la vue.
+     */
+    public FRM_Decrypt getView()
     {
-        return this.files
+        return this.view;
+    }
+    
+    /**
+     * Permet d'obtenir le composant de décryptage.
+     * @return La référence sur le composant de décryptage.
+     */
+    public Decrypt getDecrypter()
+    {
+        return this.decrypt;
     }
 }

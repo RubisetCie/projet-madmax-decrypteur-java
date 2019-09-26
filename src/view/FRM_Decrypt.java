@@ -33,8 +33,12 @@ public class FRM_Decrypt
     // La frame principale :
     private final JFrame frame;
     
-    // Le label pour afficher les informations du processus :
+    // Les widgets à exposer :
     private JLabel lheader;
+    private JButton input;
+    private JButton output;
+    private JButton act;
+    private JTextField key;
     
     // Les chemins d'accès des fichiers :
     private String fileInput = "";
@@ -90,12 +94,12 @@ public class FRM_Decrypt
         final JLabel lkey = new JLabel("Clef : 0 / 12 caractères (à Bruteforce : 12) :");
         
         // Boutons :
-        final JButton input = new JButton("Choisir source");
-        final JButton output = new JButton("Choisir destination");
-        final JButton act = new JButton("Crypter/Décrypter");
+        this.input = new JButton("Choisir source");
+        this.output = new JButton("Choisir destination");
+        this.act = new JButton("Crypter/Décrypter");
         
         // Champ de texte :
-        final JTextField key = new JTextField();
+        this.key = new JTextField();
         final KeyTextField keyfield = new KeyTextField(lkey, 12);   // Champ de texte custom !
         
         // Positionnement & paramétrage des widgets :
@@ -169,34 +173,7 @@ public class FRM_Decrypt
                 if (new File(fileInput).exists() && !fileOutput.isEmpty() && !k.isEmpty())
                 {
                     // On décrypte le fichier :
-                    DecryptResult result = controller.pcs_decrypter(fileInput, fileOutput, k);
-                    
-                    if (result.succeed)
-                    {
-                        if (result.key.isEmpty())
-                        {
-                            if (result.recognized)
-                            {
-                                lheader.setText("Le décryptage s'est déroulé avec succès.");
-                                lheader.setForeground(Color.green);
-                            }
-                            else
-                            {
-                                lheader.setText("L'opération s'est déroulée correctement mais le décryptage pourrait être invalide.");
-                                lheader.setForeground(Color.orange);
-                            }
-                        }
-                        else
-                        {
-                            lheader.setText("Le décryptage s'est déroulé avec succès avec la clef : " + result.key);
-                            lheader.setForeground(Color.green);
-                        }
-                    }
-                    else
-                    {
-                        lheader.setText("L'opération a échouée.");
-                        lheader.setForeground(Color.red);
-                    }
+                    setResult(controller.pcs_decrypter(fileInput, fileOutput, k));
                 }
                 else
                 {
@@ -255,6 +232,56 @@ public class FRM_Decrypt
         frame.setVisible(true);
     }
     
+    // Permet d'imposer un résultat après une opération de cryptage / décryptage :
+    public void setResult(final DecryptResult result)
+    {
+        if (result.succeed)
+        {
+            if (result.key.isEmpty())
+            {
+                if (result.recognized)
+                {
+                    lheader.setText("Le décryptage s'est déroulé avec succès.");
+                    lheader.setForeground(Color.green);
+                }
+                else
+                {
+                    lheader.setText("L'opération s'est déroulée correctement mais le décryptage pourrait être invalide.");
+                    lheader.setForeground(Color.orange);
+                }
+            }
+            else
+            {
+                lheader.setText("Le décryptage s'est déroulé avec succès avec la clef : " + result.key);
+                lheader.setForeground(Color.green);
+            }
+        }
+        else
+        {
+            lheader.setText("L'opération a échouée.");
+            lheader.setForeground(Color.red);
+        }
+    }
+    
+    // Permet de verrouiller les boutons pendant l'exécution du thread de bruteforce :
+    public void setButtonsActive(final boolean state)
+    {
+        this.input.setEnabled(state);
+        this.output.setEnabled(state);
+        this.act.setEnabled(state);
+        this.key.setEnabled(state);
+        
+        /*if (state)
+        {
+            this.act.setText("");
+        }
+        else
+        {
+            this.act.setText("");
+        }*/
+    }
+    
+    // Ouvre le choix de la source :
     private String chooseSource()
     {
         final JFileChooser fc = new JFileChooser();
@@ -273,6 +300,7 @@ public class FRM_Decrypt
         return "";
     }
     
+    // Ouvre le choix de la destination :
     private String chooseDestination()
     {
         final JFileChooser fc = new JFileChooser();
